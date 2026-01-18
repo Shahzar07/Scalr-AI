@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import FunnelGenerator from './components/FunnelGenerator';
 import ProfileOptimizer from './components/ProfileOptimizer';
 import PromptArchitect from './components/PromptArchitect';
@@ -7,13 +7,40 @@ import ToolRunner from './components/ToolRunner';
 import { TOOLS, TOOL_CATEGORIES } from './data/tools';
 import { AppMode, Tool, ToolCategory } from './types';
 import * as Icons from 'lucide-react';
+import { 
+  LayoutGrid, 
+  Search, 
+  Menu, 
+  X, 
+  BarChart2, 
+  UserCircle, 
+  Terminal, 
+  Zap,
+  MessageSquare,
+  ChevronRight
+} from 'lucide-react';
 
 function App() {
   const [mode, setMode] = useState<AppMode>(AppMode.DASHBOARD);
   const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory>('All');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  
+  // Initialize sidebar state based on window width
+  const [isSidebarOpen, setIsSidebarOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+
+  // Handle window resize to auto-manage sidebar on large screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const renderIcon = (iconName: string, size = 20, className = "") => {
     const Icon = (Icons as any)[iconName] || Icons.HelpCircle;
@@ -22,13 +49,13 @@ function App() {
 
   const getCategoryColor = (category: string) => {
     switch(category) {
-      case 'Ads': return 'text-orange-600 bg-orange-50 border-orange-100';
+      case 'Ads': return 'text-blue-600 bg-blue-50 border-blue-100';
       case 'Social': return 'text-sky-600 bg-sky-50 border-sky-100';
-      case 'Blog': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-      case 'Email': return 'text-purple-600 bg-purple-50 border-purple-100';
-      case 'Business': return 'text-slate-600 bg-slate-100 border-slate-200';
-      case 'Video': return 'text-rose-600 bg-rose-50 border-rose-100';
-      case 'Website': return 'text-indigo-600 bg-indigo-50 border-indigo-100';
+      case 'Blog': return 'text-indigo-600 bg-indigo-50 border-indigo-100';
+      case 'Email': return 'text-slate-600 bg-slate-100 border-slate-200';
+      case 'Business': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+      case 'Video': return 'text-blue-700 bg-blue-50 border-blue-200';
+      case 'Website': return 'text-slate-700 bg-slate-100 border-slate-300';
       case 'Profile': return 'text-blue-600 bg-blue-50 border-blue-100';
       case 'Shadow Ops': return 'text-amber-600 bg-amber-50 border-amber-100';
       default: return 'text-blue-600 bg-blue-50 border-blue-100';
@@ -51,12 +78,14 @@ function App() {
   const handleToolClick = (toolId: string) => {
     setSelectedToolId(toolId);
     setMode(AppMode.TOOL);
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);
   };
 
   const handleNavClick = (newMode: AppMode) => {
     setMode(newMode);
     setSelectedToolId(null);
     if (newMode === AppMode.DASHBOARD) setSelectedCategory('All');
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);
   };
 
   const handleCategorySelect = (cat: ToolCategory) => {
@@ -69,97 +98,250 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex overflow-hidden">
+    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-sans text-slate-900">
       
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} shadow-sm`}>
-        <div className="h-full flex flex-col">
-           <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-100 bg-white">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-blue-500/20"><Icons.Ghost size={20} /></div>
-              <h1 className="text-lg font-extrabold tracking-tight text-slate-900">Ghostwriter<span className="text-blue-600">OS</span></h1>
-           </div>
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && window.innerWidth < 1024 && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-           <div className="p-4 space-y-1">
-              <button onClick={() => handleNavClick(AppMode.DASHBOARD)} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${mode === AppMode.DASHBOARD && selectedCategory === 'All' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'text-slate-600 hover:bg-slate-50'}`}>
-                 <Icons.LayoutGrid size={18} /> Dashboard
-              </button>
-              <button onClick={() => handleNavClick(AppMode.PROFILE_OPTIMIZER)} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${mode === AppMode.PROFILE_OPTIMIZER ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'text-slate-600 hover:bg-slate-50'}`}>
-                 <Icons.UserCheck size={18} /> Profile Optimizer
-              </button>
-              <button onClick={() => handleNavClick(AppMode.FUNNEL)} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${mode === AppMode.FUNNEL ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'text-slate-600 hover:bg-slate-50'}`}>
-                 <Icons.PenTool size={18} /> Funnel Builder
-              </button>
-              <button onClick={() => handleNavClick(AppMode.PROMPT_ARCHITECT)} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${mode === AppMode.PROMPT_ARCHITECT ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'text-slate-600 hover:bg-slate-50'}`}>
-                 <Icons.Terminal size={18} /> Prompt Architect
-              </button>
-           </div>
+      {/* Sidebar Navigation - Dark Navy Theme */}
+      <aside 
+        className={`
+          fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#0B1121] text-white flex flex-col transition-transform duration-300 ease-in-out border-r border-white/5
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-72'}
+        `}
+      >
+        {/* Logo */}
+        <div className="h-16 flex items-center px-6 border-b border-white/5 bg-[#0B1121]">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-600/20">
+              <BarChart2 size={18} className="text-white" />
+            </div>
+            <span className="font-display font-bold text-lg tracking-tight">Scalr<span className="text-blue-500">.ai</span></span>
+          </div>
+          <button 
+            className="ml-auto lg:hidden text-slate-400 hover:text-white"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-           <div className="px-6 py-2 mt-2"><h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tools Library</h3></div>
+        {/* Main Nav */}
+        <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+          
+          {/* Core Apps */}
+          <div className="space-y-1">
+            <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Platform</p>
+            
+            <button
+              onClick={() => handleNavClick(AppMode.DASHBOARD)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                mode === AppMode.DASHBOARD && !selectedToolId 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <LayoutGrid size={18} /> Dashboard
+            </button>
 
-           <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-0.5 scrollbar-hide">
-              {TOOL_CATEGORIES.filter(c => c !== 'All').map(cat => (
-                 <button key={cat} onClick={() => handleCategorySelect(cat)} className={`w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm transition-colors ${mode === AppMode.DASHBOARD && selectedCategory === cat ? 'bg-slate-100 text-slate-900 font-semibold' : 'text-slate-500 hover:bg-slate-50'}`}>
-                    <span className="flex items-center gap-2">{cat}</span>
-                    <Icons.ChevronRight size={14} className="text-slate-400" />
-                 </button>
-              ))}
-           </div>
-           
-           <div className="p-4 border-t border-slate-100">
-              <div className="flex items-center gap-3 px-2 py-2">
-                 <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200"><Icons.User size={14} /></div>
-                 <div className="text-xs"><div className="text-slate-900 font-bold">Pro Operator</div><div className="text-slate-500">Tier: Elite</div></div>
-              </div>
-           </div>
+            <button
+              onClick={() => handleNavClick(AppMode.FUNNEL)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                mode === AppMode.FUNNEL 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Zap size={18} /> Funnel Architect
+            </button>
+
+            <button
+              onClick={() => handleNavClick(AppMode.PROFILE_OPTIMIZER)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                mode === AppMode.PROFILE_OPTIMIZER 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <UserCircle size={18} /> Profile Audit
+            </button>
+
+             <button
+              onClick={() => handleNavClick(AppMode.PROMPT_ARCHITECT)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                mode === AppMode.PROMPT_ARCHITECT 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Terminal size={18} /> Prompt Engineer
+            </button>
+          </div>
+
+          {/* Categories */}
+          <div className="space-y-1">
+            <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">Tool Suite</p>
+            {TOOL_CATEGORIES.filter(c => c !== 'All').map(cat => (
+               <button
+                  key={cat}
+                  onClick={() => handleCategorySelect(cat)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all group ${
+                    selectedCategory === cat 
+                        ? 'bg-white/10 text-white' 
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+               >
+                  <span>{cat}</span>
+                  {selectedCategory === cat && <ChevronRight size={14} className="text-blue-500" />}
+               </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Brand Footer */}
+        <div className="p-6 border-t border-white/5 bg-[#0F1623]">
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-sky-500 flex items-center justify-center text-xs font-bold text-white border border-white/10">
+                AI
+             </div>
+             <div className="overflow-hidden">
+                <p className="text-sm font-medium text-white truncate">Scalr Enterprise</p>
+                <p className="text-xs text-slate-500 truncate">Systems Operational</p>
+             </div>
+          </div>
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
-         <header className="h-16 flex items-center justify-between px-4 border-b border-slate-200 lg:hidden bg-white">
-             <div className="flex items-center gap-3">
-                 <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-slate-500"><Icons.Menu size={24} /></button>
-                 <span className="font-extrabold text-slate-900">Ghostwriter<span className="text-blue-600">OS</span></span>
-             </div>
-         </header>
+      {/* Main Content Area - White Background */}
+      <main className="flex-1 flex flex-col min-w-0 bg-[#F8FAFC]">
+        
+        {/* Mobile Header */}
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:hidden sticky top-0 z-30">
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg">
+            <Menu size={24} />
+          </button>
+          <span className="font-display font-bold text-lg text-slate-900">Scalr.ai</span>
+          <div className="w-10" /> 
+        </header>
 
-         <main className="flex-1 overflow-y-auto p-4 md:p-8 relative scrollbar-hide">
-            <div className="relative z-10 max-w-7xl mx-auto">
-                {mode === AppMode.DASHBOARD && (
-                    <div className="animate-fade-in space-y-8">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-slate-200/60">
-                            <div>
-                                <h2 className="text-3xl font-black text-blue-950 tracking-tight">{selectedCategory === 'All' ? 'Full Suite' : selectedCategory}</h2>
-                                <p className="text-slate-500 mt-1">Access the complete Ghostwriter toolkit.</p>
-                            </div>
-                            <div className="relative w-full md:w-80"><input type="text" placeholder="Search..." className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /><Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} /></div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {filteredTools.map(tool => (
-                                <button key={tool.id} onClick={() => handleToolClick(tool.id)} className="group flex flex-col text-left bg-white border border-slate-200 hover:border-blue-300 hover:shadow-xl hover:-translate-y-1 p-6 rounded-2xl transition-all relative overflow-visible">
-                                    <div className="flex justify-between items-start mb-6 w-full">
-                                        <div className="text-slate-700 group-hover:text-blue-600 transition-colors">{renderIcon(tool.iconName, 32)}</div>
-                                        <div className="text-slate-300 hover:text-yellow-400 transition-colors"><Icons.Star size={20} /></div>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2 mb-3">
-                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getCategoryColor(tool.category)}`}>{tool.category}</span>
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-700">{tool.title}</h3>
-                                    <p className="text-sm text-slate-500 leading-relaxed line-clamp-3">{tool.description}</p>
-                                </button>
-                            ))}
-                        </div>
+        {/* Content Scroll Area */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          <div className="p-4 md:p-8 max-w-7xl mx-auto">
+            
+            {/* Breadcrumbs / Search Header */}
+            {mode === AppMode.DASHBOARD && (
+                <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-1">
+                            {selectedCategory === 'All' ? 'Command Center' : `${selectedCategory} Tools`}
+                        </h1>
+                        <p className="text-slate-500 text-sm">Welcome to the elite revenue architecture engine.</p>
                     </div>
-                )}
+                    <div className="relative w-full md:w-96">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input 
+                            type="text" 
+                            placeholder="Search tools..." 
+                            className="w-full bg-white border border-slate-200 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none shadow-sm transition-all"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                </div>
+            )}
 
-                {mode === AppMode.TOOL && selectedTool && <div className="animate-fade-in"><button onClick={() => setMode(AppMode.DASHBOARD)} className="flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-8 text-sm font-semibold transition-colors"><Icons.ArrowLeft size={16} /> Back to Dashboard</button><ToolRunner tool={selectedTool} /></div>}
-                {mode === AppMode.FUNNEL && <div className="animate-fade-in"><FunnelGenerator /></div>}
-                {mode === AppMode.PROFILE_OPTIMIZER && <div className="animate-fade-in max-w-5xl mx-auto"><ProfileOptimizer /></div>}
-                {mode === AppMode.PROMPT_ARCHITECT && <div className="animate-fade-in max-w-5xl mx-auto"><PromptArchitect /></div>}
-            </div>
-         </main>
-      </div>
+            {/* View Rendering */}
+            {mode === AppMode.DASHBOARD && (
+               <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                     {filteredTools.map(tool => (
+                        <button
+                           key={tool.id}
+                           onClick={() => handleToolClick(tool.id)}
+                           className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group text-left h-full flex flex-col"
+                        >
+                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 transition-colors ${getCategoryColor(tool.category)} group-hover:scale-110 duration-300`}>
+                              {renderIcon(tool.iconName, 20)}
+                           </div>
+                           <h3 className="font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{tool.title}</h3>
+                           <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-4 flex-1">{tool.description}</p>
+                           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                              <span>Run Tool</span> <ArrowRight size={10} className="group-hover:translate-x-1 transition-transform text-blue-500" />
+                           </div>
+                        </button>
+                     ))}
+                  </div>
+                  
+                  {filteredTools.length === 0 && (
+                      <div className="text-center py-20">
+                          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                              <Search size={24} />
+                          </div>
+                          <h3 className="text-slate-900 font-bold mb-1">No tools found</h3>
+                          <p className="text-slate-500 text-sm">Try searching for something else or change category.</p>
+                      </div>
+                  )}
+               </>
+            )}
+
+            {mode === AppMode.TOOL && selectedTool && (
+               <div className="animate-fade-in-up">
+                   <button 
+                     onClick={() => setMode(AppMode.DASHBOARD)}
+                     className="flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 mb-6 font-medium transition-colors"
+                   >
+                     <ArrowRight size={16} className="rotate-180" /> Back to Dashboard
+                   </button>
+                   <ToolRunner tool={selectedTool} />
+               </div>
+            )}
+
+            {mode === AppMode.FUNNEL && (
+                <div className="animate-fade-in-up">
+                   <FunnelGenerator />
+                </div>
+            )}
+
+            {mode === AppMode.PROFILE_OPTIMIZER && (
+                <div className="animate-fade-in-up">
+                   <ProfileOptimizer />
+                </div>
+            )}
+
+            {mode === AppMode.PROMPT_ARCHITECT && (
+                <div className="animate-fade-in-up">
+                   <PromptArchitect />
+                </div>
+            )}
+
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
+
+// Helper for inline arrow
+const ArrowRight = ({ size, className }: { size?: number, className?: string }) => (
+    <svg 
+        width={size || 24} 
+        height={size || 24} 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className={className}
+    >
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+    </svg>
+);
 
 export default App;

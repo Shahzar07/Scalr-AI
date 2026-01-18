@@ -1,6 +1,16 @@
 
 import { LucideIcon } from 'lucide-react';
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  plan: 'Free' | 'Pro' | 'Enterprise';
+  status: 'Active' | 'Suspended';
+  joinedDate: string;
+  lastActive: string;
+}
+
 export interface AdVariation {
   type: string;
   headline: string;
@@ -73,4 +83,5 @@ export interface Tool {
   promptTemplate: string;
   supportsImageGeneration?: boolean;
   supportsCreatorCloning?: boolean;
+  guide?: string; // New field for strategic usage instructions
 }

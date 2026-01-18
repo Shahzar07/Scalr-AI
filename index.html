@@ -1,48 +1,53 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GhostwriterOS</title>
+    <title>Scalr AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
-              mono: ['JetBrains Mono', 'monospace'],
+              display: ['"Space Grotesk"', 'sans-serif'],
             },
             colors: {
-              // We will rely on standard Tailwind Slate/Blue colors for the new light theme, 
-              // but keeping 'ghost' mapped to Slate for backward compatibility in logic.
-              ghost: {
-                50: '#f8fafc',
-                100: '#f1f5f9',
-                200: '#e2e8f0',
-                300: '#cbd5e1',
-                400: '#94a3b8',
-                500: '#64748b',
-                600: '#475569',
-                700: '#334155',
-                800: '#1e293b',
-                900: '#0f172a',
-                950: '#020617',
-              },
-              accent: {
-                50: '#eff6ff',
-                100: '#dbeafe',
-                200: '#bfdbfe',
-                300: '#93c5fd',
-                400: '#60a5fa',
-                500: '#3b82f6', // blue-500
-                600: '#2563eb', // blue-600
-                700: '#1d4ed8',
-                800: '#1e40af',
-                900: '#1e3a8a',
-                950: '#172554',
+              brand: {
+                 dark: '#0B1121', // Deep Navy
+                 navy: '#151e32', // Card Navy
+                 blue: '#2563EB', // Primary Blue
+                 sky: '#38BDF8',  // Accent Sky
+                 surface: '#F8FAFC' // White/Gray surface
               }
+            },
+            animation: {
+               'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+               'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+               'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+               'shimmer': 'shimmer 2s linear infinite',
+            },
+            keyframes: {
+               fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' },
+               },
+               fadeInUp: {
+                  '0%': { opacity: '0', transform: 'translateY(30px)' },
+                  '100%': { opacity: '1', transform: 'translateY(0)' },
+               },
+               shimmer: {
+                  '0%': { backgroundPosition: '200% 0' },
+                  '100%': { backgroundPosition: '-200% 0' }
+               }
+            },
+            backgroundImage: {
+              'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #1e40af 0deg, #3b82f6 180deg, #60a5fa 360deg)',
             }
           },
         },
@@ -50,8 +55,8 @@
     </script>
     <style>
       body {
-        background-color: #f8fafc; /* slate-50 */
-        color: #0f172a; /* slate-900 */
+        background-color: #F8FAFC;
+        color: #0F172A;
       }
       .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -60,12 +65,23 @@
           -ms-overflow-style: none;
           scrollbar-width: none;
       }
-      .animate-fade-in {
-        animation: fadeIn 0.3s ease-in-out;
+      /* Custom selection color */
+      ::selection {
+        background-color: rgba(37, 99, 235, 0.2);
+        color: #0F172A;
       }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
+      
+      .glass-nav {
+        background: rgba(11, 17, 33, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      
+      .text-gradient {
+        background: linear-gradient(to right, #60A5FA, #38BDF8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
     </style>
   <script type="importmap">
@@ -81,7 +97,7 @@
 }
 </script>
 </head>
-  <body>
+  <body class="bg-brand-surface text-slate-900 antialiased">
     <div id="root"></div>
   </body>
 </html>

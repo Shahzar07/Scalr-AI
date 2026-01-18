@@ -2,8 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Tool, ToolInput } from '../types';
 import { runTool, generateImage, refineContent, generateIdeas } from '../services/geminiService';
-// Added Zap to the named imports from lucide-react
-import { Loader2, Copy, Check, Wand2, Sparkles, Send, Lightbulb, Link as LinkIcon, Info, Globe, AlertCircle, X, ChevronRight, Zap } from 'lucide-react';
+import { Loader2, Copy, Check, Wand2, Sparkles, Send, Lightbulb, Link as LinkIcon, Info, Globe, AlertCircle, X, ChevronRight, Zap, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface ToolRunnerProps {
@@ -21,6 +20,7 @@ const ToolRunner: React.FC<ToolRunnerProps> = ({ tool }) => {
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<'preview' | 'raw'>('preview');
   const [customRefinement, setCustomRefinement] = useState<string>('');
+  const [showGuide, setShowGuide] = useState(true);
 
   const [cloningEnabled, setCloningEnabled] = useState(false);
   const [creatorUrl, setCreatorUrl] = useState('');
@@ -102,15 +102,36 @@ const ToolRunner: React.FC<ToolRunnerProps> = ({ tool }) => {
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-full mb-3 border border-blue-100">
              <Wand2 size={12} /> Strategic Protocol
           </div>
-          <h2 className="text-4xl font-black text-blue-950 mb-3 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-black text-blue-950 mb-3 tracking-tight">
              {tool.title}
           </h2>
           <p className="text-slate-500 max-w-2xl text-lg leading-relaxed">{tool.description}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Form */}
+        {/* Left Column: Form & Guide */}
         <div className="lg:col-span-5 space-y-6">
+          
+          {/* Strategic Guide Section */}
+          {tool.guide && (
+            <div className="bg-emerald-50 border border-emerald-100 rounded-xl overflow-hidden shadow-sm">
+                <button 
+                    onClick={() => setShowGuide(!showGuide)}
+                    className="w-full flex items-center justify-between p-4 bg-emerald-100/50 hover:bg-emerald-100 transition-colors"
+                >
+                    <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm uppercase tracking-wide">
+                        <BookOpen size={16} /> Strategic Briefing
+                    </div>
+                    {showGuide ? <ChevronUp size={16} className="text-emerald-700" /> : <ChevronDown size={16} className="text-emerald-700" />}
+                </button>
+                {showGuide && (
+                    <div className="p-4 text-emerald-900 text-sm leading-relaxed border-t border-emerald-100/50 animate-fade-in">
+                        {tool.guide}
+                    </div>
+                )}
+            </div>
+          )}
+
           {tool.supportsCreatorCloning && (
             <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm group hover:border-blue-300 transition-colors">
                <div className="flex items-center justify-between mb-3">
