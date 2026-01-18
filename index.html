@@ -19,11 +19,11 @@
             },
             colors: {
               brand: {
-                 dark: '#0B1121', // Deep Navy
-                 navy: '#151e32', // Card Navy
-                 blue: '#2563EB', // Primary Blue
-                 sky: '#38BDF8',  // Accent Sky
-                 surface: '#F8FAFC' // White/Gray surface
+                 dark: '#0B1121',
+                 navy: '#151e32',
+                 blue: '#2563EB',
+                 sky: '#38BDF8',
+                 surface: '#F8FAFC'
               }
             },
             animation: {
@@ -45,9 +45,6 @@
                   '0%': { backgroundPosition: '200% 0' },
                   '100%': { backgroundPosition: '-200% 0' }
                }
-            },
-            backgroundImage: {
-              'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #1e40af 0deg, #3b82f6 180deg, #60a5fa 360deg)',
             }
           },
         },
@@ -65,34 +62,21 @@
           -ms-overflow-style: none;
           scrollbar-width: none;
       }
-      /* Custom selection color */
       ::selection {
         background-color: rgba(37, 99, 235, 0.2);
         color: #0F172A;
-      }
-      
-      .glass-nav {
-        background: rgba(11, 17, 33, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      }
-      
-      .text-gradient {
-        background: linear-gradient(to right, #60A5FA, #38BDF8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
       }
     </style>
   <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.3",
+    "react-dom": "https://esm.sh/react-dom@^19.2.3",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
     "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react-markdown": "https://esm.sh/react-markdown@^10.1.0"
+    "lucide-react": "https://esm.sh/lucide-react@^0.475.0",
+    "react-markdown": "https://esm.sh/react-markdown@^10.0.0"
   }
 }
 </script>
