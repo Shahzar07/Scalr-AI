@@ -19,13 +19,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || status === 'loading') return;
 
     setStatus('loading');
 
     try {
-      // Using FormSubmit.co AJAX endpoint for background submission
-      // This sends the email directly to you without opening the user's mail client
+      // Background silent submission to your email via FormSubmit AJAX
       const response = await fetch("https://formsubmit.co/ajax/shahzarrayyan123@gmail.com", {
         method: "POST",
         headers: { 
@@ -34,21 +33,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
         },
         body: JSON.stringify({
             email: email,
-            message: "New Newsletter Subscriber from Scalr AI Landing Page",
-            _subject: "🔥 New High-Intent Lead: Scalr AI"
+            _subject: "🚀 NEW LEAD: Scalr AI Newsletter",
+            _captcha: "false",
+            _template: "table",
+            message: `A new user has subscribed to the newsletter. \nEmail: ${email}`
         })
       });
 
       if (response.ok) {
         setStatus('success');
         setEmail('');
+        // Reset status after 5 seconds
         setTimeout(() => setStatus('idle'), 5000);
       } else {
         setStatus('error');
         setTimeout(() => setStatus('idle'), 3000);
       }
     } catch (err) {
-      console.error("Lead submission error:", err);
+      console.error("Submission failed:", err);
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
     }
@@ -201,7 +203,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
                 <button 
                   type="submit"
                   disabled={status === 'loading'}
-                  className={`px-8 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70`}
+                  className={`px-8 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 min-w-[120px]`}
                 >
                   {status === 'loading' ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -213,7 +215,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
              
              {status === 'success' && (
                 <div className="absolute top-full mt-4 left-0 right-0 flex items-center justify-center gap-2 text-emerald-600 font-bold animate-fade-in">
-                   <CheckCircle size={18} /> You're on the list. High-status updates incoming.
+                   <CheckCircle size={18} /> Thank you! You've been subscribed.
                 </div>
              )}
 
