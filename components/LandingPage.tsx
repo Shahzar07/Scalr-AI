@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Zap, BarChart2, Shield, Sparkles, Mail, Send, CheckCircle, Users } from 'lucide-react';
+import { ArrowRight, Zap, BarChart2, Shield, Sparkles, Mail, Send, CheckCircle, Users, Loader2 } from 'lucide-react';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -9,7 +9,7 @@ interface LandingPageProps {
 const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
   const [scrolled, setScrolled] = useState(false);
   const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -17,19 +17,40 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      // Leads are sent directly to the specified email address
-      const recipient = "shahzarrayyan123@gmail.com";
-      const subject = encodeURIComponent("New Lead: Scalr AI Newsletter Subscription");
-      const body = encodeURIComponent(`New lead captured from Scalr AI.\n\nLead Email: ${email}\n\nPlease add this user to your CRM/Newsletter list.`);
-      
-      window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
-      
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 5000);
-      setEmail('');
+    if (!email) return;
+
+    setStatus('loading');
+
+    try {
+      // Using FormSubmit.co AJAX endpoint for background submission
+      // This sends the email directly to you without opening the user's mail client
+      const response = await fetch("https://formsubmit.co/ajax/shahzarrayyan123@gmail.com", {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({
+            email: email,
+            message: "New Newsletter Subscriber from Scalr AI Landing Page",
+            _subject: "🔥 New High-Intent Lead: Scalr AI"
+        })
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setEmail('');
+        setTimeout(() => setStatus('idle'), 5000);
+      } else {
+        setStatus('error');
+        setTimeout(() => setStatus('idle'), 3000);
+      }
+    } catch (err) {
+      console.error("Lead submission error:", err);
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 3000);
     }
   };
 
@@ -175,18 +196,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-900 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm"
                    value={email}
                    onChange={(e) => setEmail(e.target.value)}
+                   disabled={status === 'loading'}
                 />
                 <button 
                   type="submit"
-                  className="px-8 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 active:scale-95"
+                  disabled={status === 'loading'}
+                  className={`px-8 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-black transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70`}
                 >
-                  Join <Send size={18} />
+                  {status === 'loading' ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <>Join <Send size={18} /></>
+                  )}
                 </button>
              </div>
              
-             {submitted && (
+             {status === 'success' && (
                 <div className="absolute top-full mt-4 left-0 right-0 flex items-center justify-center gap-2 text-emerald-600 font-bold animate-fade-in">
-                   <CheckCircle size={18} /> Lead generated. Check your mail client.
+                   <CheckCircle size={18} /> You're on the list. High-status updates incoming.
+                </div>
+             )}
+
+             {status === 'error' && (
+                <div className="absolute top-full mt-4 left-0 right-0 flex items-center justify-center gap-2 text-red-600 font-bold animate-fade-in">
+                   Something went wrong. Please try again.
                 </div>
              )}
           </form>
