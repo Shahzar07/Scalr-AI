@@ -137,7 +137,7 @@ function App() {
             
             <button
               onClick={() => setShowLanding(true)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all mb-4"
             >
               <Home size={18} /> Back to Home
             </button>

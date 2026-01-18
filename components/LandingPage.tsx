@@ -20,12 +20,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      // Direct lead generation to the owner's email
+      // Leads are sent directly to the specified email address
       const recipient = "shahzarrayyan123@gmail.com";
       const subject = encodeURIComponent("New Lead: Scalr AI Newsletter Subscription");
-      const body = encodeURIComponent(`New subscription lead captured from Scalr AI Landing Page.\n\nEmail: ${email}\n\nStatus: High Intent\nSource: Hero/Footer Newsletter Form`);
+      const body = encodeURIComponent(`New lead captured from Scalr AI.\n\nLead Email: ${email}\n\nPlease add this user to your CRM/Newsletter list.`);
       
-      window.open(`mailto:${recipient}?subject=${subject}&body=${body}`, '_blank');
+      window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
       
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 5000);
